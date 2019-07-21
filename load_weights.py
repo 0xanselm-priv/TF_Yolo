@@ -4,7 +4,9 @@ import tensorflow as tf
 import numpy as np
 
 from yolo import Yolo
+from pathlib import Path
 
+WEIGHT_FILE = './data/yolov3.weights'
 
 def load_weights(variables, file_name):
     """Reshapes and loads official pretrained Yolo weights.
@@ -13,6 +15,7 @@ def load_weights(variables, file_name):
     A list of assign operations.
     """
     with open(file_name, "rb") as f:
+        print("FILENAME OF WEIGHTS:", file_name)
         # Skip first 5 values containing irrelevant info
         np.fromfile(f, dtype=np.int32, count=5)
         weights = np.fromfile(f, dtype=np.float32)
@@ -98,13 +101,17 @@ def main():
     model(inputs, training=False)
 
     model_vars = tf.global_variables(scope='yolo_model')
-    assign_ops = load_weights(model_vars, './data/yolo.weights')
+    weight_file = Path(WEIGHT_FILE)
+    if weight_file.is_file():
+        assign_ops = load_weights(model_vars, WEIGHT_FILE)
+    else:
+        print("Weight File missing. Please load from https://pjreddie.com/media/files/yolov3.weights\nand store in ./data")
 
     saver = tf.train.Saver(tf.global_variables(scope='yolo_model'))
 
     with tf.Session() as sess:
         sess.run(assign_ops)
-        saver.save(sess, './weights/model.ckpt')
+        saver.save(sess, './data/model.ckpt')
         print('Model has been saved successfully.')
 
 

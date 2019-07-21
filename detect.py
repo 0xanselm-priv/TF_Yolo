@@ -10,7 +10,7 @@ from yolo import Yolo
 from utility_functions import load_images, load_class_names, draw_boxes, draw_frame
 
 MODEL_SIZE = (416, 416)
-CLASS_NAMES_FILE = './data/labels/coco.names'
+CLASS_NAMES_FILE = './data/coco.names'
 MAX_OUTPUT_SIZE = 20
 
 
@@ -28,7 +28,7 @@ def main(type, iou_threshold, confidence_threshold, input_names):
         batch = load_images(input_names, model_size=MODEL_SIZE)
         inputs = tf.placeholder(tf.float32, [batch_size, *MODEL_SIZE, 3])
         detections = model(inputs, training=False)
-        saver = tf.train.Saver(tf.global_variables(scope='yolo_v3_model'))
+        saver = tf.train.Saver(tf.global_variables(scope='yolo_model'))
 
         with tf.Session() as sess:
             saver.restore(sess, './weights/model.ckpt')
@@ -41,7 +41,7 @@ def main(type, iou_threshold, confidence_threshold, input_names):
     elif type == 'video':
         inputs = tf.placeholder(tf.float32, [1, *MODEL_SIZE, 3])
         detections = model(inputs, training=False)
-        saver = tf.train.Saver(tf.global_variables(scope='yolo_v3_model'))
+        saver = tf.train.Saver(tf.global_variables(scope='yolo_model'))
 
         with tf.Session() as sess:
             saver.restore(sess, './weights/model.ckpt')
