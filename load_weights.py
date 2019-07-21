@@ -1,20 +1,16 @@
-"""Loads Yolo v3 pretrained weights and saves them in tensorflow format."""
+"""Loads Yolo pretrained weights and saves them in tensorflow format."""
 
 import tensorflow as tf
 import numpy as np
 
-from yolo_v3 import Yolo_v3
+from yolo import Yolo
 
 
 def load_weights(variables, file_name):
     """Reshapes and loads official pretrained Yolo weights.
-
-    Args:
-        variables: A list of tf.Variable to be assigned.
-        file_name: A name of a file containing weights.
-
-    Returns:
-        A list of assign operations.
+    variables: A list of tf.Variable to be assigned.
+    file_name: A name of a file containing weights.
+    A list of assign operations.
     """
     with open(file_name, "rb") as f:
         # Skip first 5 values containing irrelevant info
@@ -24,8 +20,7 @@ def load_weights(variables, file_name):
         assign_ops = []
         ptr = 0
 
-        # Load weights for Darknet part.
-        # Each convolution layer has batch normalization.
+        # Load weights for Pjreddies Darknet Framework.
         for i in range(52):
             conv_var = variables[5 * i]
             gamma, beta, mean, variance = variables[5 * i + 1:5 * i + 5]
@@ -93,7 +88,7 @@ def load_weights(variables, file_name):
 
 
 def main():
-    model = Yolo_v3(n_classes=80, model_size=(416, 416),
+    model = Yolo(n_classes=80, model_size=(416, 416),
                     max_output_size=5,
                     iou_threshold=0.5,
                     confidence_threshold=0.5)
@@ -102,10 +97,10 @@ def main():
 
     model(inputs, training=False)
 
-    model_vars = tf.global_variables(scope='yolo_v3_model')
-    assign_ops = load_weights(model_vars, './weights/yolov3.weights')
+    model_vars = tf.global_variables(scope='yolo_model')
+    assign_ops = load_weights(model_vars, './data/yolo.weights')
 
-    saver = tf.train.Saver(tf.global_variables(scope='yolo_v3_model'))
+    saver = tf.train.Saver(tf.global_variables(scope='yolo_model'))
 
     with tf.Session() as sess:
         sess.run(assign_ops)
