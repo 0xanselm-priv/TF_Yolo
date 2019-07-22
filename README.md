@@ -14,7 +14,7 @@ https://pjreddie.com/media/files/yolov3.weights
 ```
 
 ### How to run model
-Please make sure to load and store the weights in `./data` Afterwards put some images as `*.jpg`  in the `./data/inmages` folder
+Please make sure to load and store the weights in `./data` Afterwards put some images as `*.jpg`  in the `./data/images` folder
 and run
 ```
 python detect.py
