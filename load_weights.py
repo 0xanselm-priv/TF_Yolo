@@ -5,16 +5,13 @@ import numpy as np
 
 from yolo_darknet import Yolo
 from pathlib import Path
+import os
 
 WEIGHT_FILE = './data/yolov3.weights'
 MODEL_FILE = './data/model.ckpt'
 
 def load_weights(variables, file_name):
-    """Reshapes and loads official pretrained Yolo weights.
-    variables: A list of tf.Variable to be assigned.
-    file_name: A name of a file containing weights.
-    A list of assign operations.
-    """
+    """Reshapes and loads official pretrained Yolo weights."""
     with open(file_name, "rb") as f:
         print("Filename of weights:", file_name)
         # Skip first 5 values containing irrelevant info
@@ -90,12 +87,7 @@ def load_weights(variables, file_name):
     return assign_ops
 
 
-def main():
-    weight_file = Path(MODEL_FILE)
-    if weight_file.is_file():
-        print("Model already found in Dir.\nRun Detections")
-        return 0
-
+def build():
     model = Yolo(n_classes=80, model_size=(416, 416),
                     max_output_size=5,
                     iou_threshold=0.5,
@@ -106,19 +98,21 @@ def main():
     model(inputs, training=False)
 
     model_vars = tf.global_variables(scope='yolo_model')
-    weight_file = Path(WEIGHT_FILE)
-    if weight_file.is_file():
-        assign_ops = load_weights(model_vars, WEIGHT_FILE)
+    weight_f = os.path.abspath(WEIGHT_FILE)
+    if os.path.isfile(weight_f):
+        assign_ops = load_weights(model_vars, weight_f)
     else:
         print("Weight File missing. Please load from https://pjreddie.com/media/files/yolov3.weights\nand store in ./data")
+        return 0
 
     saver = tf.train.Saver(tf.global_variables(scope='yolo_model'))
 
     with tf.Session() as sess:
         sess.run(assign_ops)
         saver.save(sess, MODEL_FILE)
-        print('Model has been saved successfully.')
+        print("Model has been saved successfully.")
+        sess.close()
+    return 1
 
-
-if __name__ == '__main__':
-    main()
+if __name__ == "__main__":
+    build()

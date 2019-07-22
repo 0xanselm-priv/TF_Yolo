@@ -36,9 +36,11 @@ def main(type, iou_threshold, confidence_threshold, input_names):
         detections = model(inputs, training=False)
         saver = tf.train.Saver(tf.global_variables(scope='yolo_model'))
 
-        with tf.Session() as sess:
-            saver.restore(sess, './data/model.ckpt')
-            detection_result = sess.run(detections, feed_dict={inputs: batch})
+        with tf.Session() as sess2:
+            saver.restore(sess2, './data/model.ckpt')
+            print("Model restored successfully.")
+            detection_result = sess2.run(detections, feed_dict={inputs: batch})
+
 
         utility_functions.draw_boxes(input_names, detection_result, class_names, MODEL_SIZE)
 
@@ -49,8 +51,8 @@ def main(type, iou_threshold, confidence_threshold, input_names):
         detections = model(inputs, training=False)
         saver = tf.train.Saver(tf.global_variables(scope='yolo_model'))
 
-        with tf.Session() as sess:
-            saver.restore(sess, './data/model.ckpt')
+        with tf.Session() as sess2:
+            saver.restore(sess2, './data/model.ckpt')
 
             win_name = 'Video detection'
             cv2.namedWindow(win_name)
@@ -69,7 +71,7 @@ def main(type, iou_threshold, confidence_threshold, input_names):
                         break
                     resized_frame = cv2.resize(frame, dsize=MODEL_SIZE[::-1],
                                                interpolation=cv2.INTER_NEAREST)
-                    detection_result = sess.run(detections,
+                    detection_result = sess2.run(detections,
                                                 feed_dict={inputs: [resized_frame]})
 
                     utility_functions.draw_frame(frame, frame_size, detection_result,
@@ -86,22 +88,21 @@ def main(type, iou_threshold, confidence_threshold, input_names):
             finally:
                 cv2.destroyAllWindows()
                 cap.release()
-                print('Detections have been saved successfully.')
+                print("Detections have been saved successfully.")
 
     else:
         raise ValueError("Inappropriate data type. Please choose either 'video' or 'images'.")
 
 
-def check_environment():
-    if not (os.path.isfile(WEIGHT_FILE)):
-        print(
-            "Weight File missing. Please load from https://pjreddie.com/media/files/yolov3.weights\nand store in ./data")
-    if not (os.path.isfile(MODEL_FILE)):
-        load_weights.main()
-        print("Proceed with detection.")
-
-
 def run():
+    if not(os.path.isfile(MODEL_FILE)):
+        print("Trying to build model.")
+        if not(load_weights.build()):
+            print("Error with weigths file.")
+            return
+        print("Please restart.")
+        return
+
     iou_threshold = 0.5
     confidence_threshold = 0.5
     files = []
