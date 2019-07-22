@@ -1,4 +1,4 @@
-# Yolo Object Detection
+# Yolo Object Detection for Presentation 07/16
 
 
 ## Pip Files
@@ -14,7 +14,7 @@ https://pjreddie.com/media/files/yolov3.weights
 ```
 
 ### How to run model
-Please make sure to load and store the weights in `./data"` Afterwards put some images as `*.jpg`  in the `./data/inmages` folder
+Please make sure to load and store the weights in `./data` Afterwards put some images as `*.jpg`  in the `./data/inmages` folder
 and run
 ```
 python detect.py
