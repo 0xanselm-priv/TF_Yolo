@@ -3,10 +3,11 @@
 import tensorflow as tf
 import numpy as np
 
-from yolo import Yolo
+from yolo_darknet import Yolo
 from pathlib import Path
 
 WEIGHT_FILE = './data/yolov3.weights'
+MODEL_FILE = './data/model.ckpt'
 
 def load_weights(variables, file_name):
     """Reshapes and loads official pretrained Yolo weights.
@@ -15,11 +16,10 @@ def load_weights(variables, file_name):
     A list of assign operations.
     """
     with open(file_name, "rb") as f:
-        print("FILENAME OF WEIGHTS:", file_name)
+        print("Filename of weights:", file_name)
         # Skip first 5 values containing irrelevant info
         np.fromfile(f, dtype=np.int32, count=5)
         weights = np.fromfile(f, dtype=np.float32)
-
         assign_ops = []
         ptr = 0
 
@@ -91,6 +91,11 @@ def load_weights(variables, file_name):
 
 
 def main():
+    weight_file = Path(MODEL_FILE)
+    if weight_file.is_file():
+        print("Model already found in Dir.\nRun Detections")
+        return 0
+
     model = Yolo(n_classes=80, model_size=(416, 416),
                     max_output_size=5,
                     iou_threshold=0.5,
@@ -111,7 +116,7 @@ def main():
 
     with tf.Session() as sess:
         sess.run(assign_ops)
-        saver.save(sess, './data/model.ckpt')
+        saver.save(sess, MODEL_FILE)
         print('Model has been saved successfully.')
 
 

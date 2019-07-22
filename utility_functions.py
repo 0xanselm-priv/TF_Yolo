@@ -1,20 +1,19 @@
-"""Contains utility functions for Yolo v3 model."""
+"""Contains utility functions for Yolo model like
+loading COCO class cames, loading images
+"""
 
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 from seaborn import color_palette
 import cv2
+import os
 
 
 def load_images(img_names, model_size):
     """Loads images in a 4D array.
-    Args:
-        img_names: A list of images names.
-        model_size: The input size of the model.
-        data_format: A format for the array returned
-            ('channels_first' or 'channels_last').
-    Returns:
-        A 4D NumPy array.
+    img_names: A list of images names.
+    model_size: The input size of the model.
+    data_format: A format for the array returned
     """
     imgs = []
 
@@ -39,13 +38,10 @@ def load_class_names(file_name):
 
 def draw_boxes(img_names, boxes_dicts, class_names, model_size):
     """Draws detected boxes.
-    Args:
-        img_names: A list of input images names.
-        boxes_dict: A class-to-boxes dictionary.
-        class_names: A class names list.
-        model_size: The input size of the model.
-    Returns:
-        None.
+    img_names: A list of input images names.
+    boxes_dict: A class-to-boxes dictionary.
+    class_names: A class names list.
+    model_size: The input size of the model.
     """
     colors = ((np.array(color_palette("hls", 80)) * 255)).astype(np.uint8)
     for num, img_name, boxes_dict in zip(range(len(img_names)), img_names,
@@ -81,7 +77,8 @@ def draw_boxes(img_names, boxes_dicts, class_names, model_size):
                                               confidence * 100))
 
         rgb_img = img.convert('RGB')
-
+        if not (os.path.isdir('./detections')):
+            os.makedirs("./detections")
         rgb_img.save('./detections/detection_' + str(num + 1) + '.jpg')
 
 

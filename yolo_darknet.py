@@ -231,7 +231,6 @@ def yolo_layer(inputs, n_classes, anchors, img_size, data_format):
 
 
 def upsample(inputs, out_shape, data_format):
-    """Upsamples to `out_shape` using nearest neighbor interpolation."""
     if data_format == 'channels_first':
         inputs = tf.transpose(inputs, [0, 2, 3, 1])
         new_height = out_shape[3]
@@ -249,7 +248,6 @@ def upsample(inputs, out_shape, data_format):
 
 
 def build_boxes(inputs):
-    """Computes top left and bottom right points of the boxes."""
     center_x, center_y, width, height, confidence, classes = \
         tf.split(inputs, [1, 1, 1, 1, 1, -1], axis=-1)
 
@@ -343,7 +341,7 @@ class Yolo:
         Returns: A list containing class-to-boxes dictionaries
                 for each sample in the batch.
         """
-        with tf.variable_scope('yolo_v3_model'):
+        with tf.variable_scope('yolo_model'):
             if self.data_format == 'channels_first':
                 inputs = tf.transpose(inputs, [0, 3, 1, 2])
 
